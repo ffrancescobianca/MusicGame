@@ -91,6 +91,30 @@ h2{font-size:clamp(2rem,6vw,3rem);background:linear-gradient(transparent 58%,rgb
 .tile.hl{background:var(--orange)}.tile.hl b,.tile.hl span{color:var(--white)}
 #prof-sel{font-family:"Caveat","Segoe Print","Comic Sans MS",cursive;font-size:1.9rem;font-weight:700;color:var(--ink);background:var(--white);border:3px solid var(--ink);border-radius:var(--wob2);padding:2px 14px;box-shadow:4px 4px 0 var(--ink);cursor:pointer;max-width:94vw}
 .tiles{grid-template-columns:repeat(auto-fit,minmax(130px,200px));justify-content:center}
+
+/* ---------- Cameo: il personaggio che commenta ---------- */
+.cameo{position:fixed;bottom:0;z-index:60;display:flex;align-items:flex-end;pointer-events:none;-webkit-user-select:none;user-select:none;visibility:hidden;transition:transform .45s cubic-bezier(.2,1.25,.4,1),visibility 0s .5s}
+.cameo.l{left:0;flex-direction:row;transform:translateX(-105%)}
+.cameo.r{right:0;flex-direction:row-reverse;transform:translateX(105%)}
+.cameo.show{visibility:visible;transition-delay:0s}
+.cameo.l.show{transform:translateX(-12px)}
+.cameo.r.show{transform:translateX(12px)}
+.cam-fig{flex:none;width:min(44vw,190px);transform-origin:50% 100%;filter:drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff) drop-shadow(5px 5px 0 var(--ink))}
+.cam-fig svg{display:block;width:100%;height:auto}
+.cameo.r .cam-fig svg{transform:scaleX(-1)}
+.cameo.ok .s-no,.cameo.no .s-ok{display:none}
+.cameo.ok.show .cam-fig{animation:camBob .9s ease-in-out infinite}
+.cameo.no.show .cam-fig{animation:camShake .3s linear 4}
+@keyframes camBob{50%{transform:translateY(-6px) rotate(1.5deg)}}
+@keyframes camShake{25%{transform:rotate(-2.5deg)}75%{transform:rotate(2.5deg)}}
+.cam-bubble{position:relative;align-self:flex-start;margin:34px 6px 0;max-width:min(46vw,210px);padding:8px 16px 10px;border:3px solid var(--ink);border-radius:var(--wob2);font-family:"Caveat","Segoe Print","Bradley Hand",cursive;font-weight:700;font-size:clamp(1.5rem,6.2vw,2.1rem);line-height:1.05;text-align:center;box-shadow:4px 4px 0 var(--ink);transform:scale(0);transform-origin:left bottom;transition:transform .3s cubic-bezier(.2,1.6,.4,1) .3s}
+.cameo.r .cam-bubble{transform-origin:right bottom}
+.cameo.show .cam-bubble{transform:rotate(-2deg) scale(1)}
+.cameo.ok .cam-bubble{background:var(--green);color:var(--ink)}
+.cameo.no .cam-bubble{background:var(--no);color:#fff}
+.cam-bubble::after{content:"";position:absolute;left:-11px;bottom:14px;width:16px;height:16px;background:inherit;border-left:3px solid var(--ink);border-bottom:3px solid var(--ink);border-bottom-left-radius:4px;transform:rotate(45deg)}
+.cameo.r .cam-bubble::after{left:auto;right:-11px;border-left:0;border-bottom:3px solid var(--ink);border-right:3px solid var(--ink);border-bottom-left-radius:0;border-bottom-right-radius:4px}
+@media (prefers-reduced-motion:reduce){.cameo.show .cam-fig{animation:none!important}}
 </style>
 </head>
 <body>
@@ -182,6 +206,125 @@ h2{font-size:clamp(2rem,6vw,3rem);background:linear-gradient(transparent 58%,rgb
   <button class="play" onclick="playTarget()">🔊 Riascolta</button>
 </section>
 
+<div class="cameo l" id="cameo" aria-hidden="true">
+  <div class="cam-fig"><svg viewBox="0 -28 300 368" xmlns="http://www.w3.org/2000/svg">
+<!-- ===== CORPO ===== -->
+<g stroke="#1d3b8b" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+  <!-- collo -->
+  <path d="M116 186 L116 256 L184 256 L184 186 Z" fill="#dfae92"/>
+  <ellipse cx="150" cy="210" rx="30" ry="13" fill="#bf8468" stroke="none"/>
+  <!-- polo -->
+  <path d="M116 226 C96 232 52 240 44 276 L38 340 L262 340 L256 276 C248 240 204 232 184 226 L150 252 Z" fill="#141735"/>
+  <path d="M86 262 L82 340 M214 262 L218 340" fill="none" stroke="#2a3070" stroke-width="3"/>
+  <!-- colletto -->
+  <path d="M114 218 L150 254 L128 276 L88 238 Z" fill="none" stroke="#ffffff" stroke-width="10"/>
+  <path d="M186 218 L150 254 L172 276 L212 238 Z" fill="none" stroke="#ffffff" stroke-width="10"/>
+  <path d="M114 218 L150 254 L128 276 L88 238 Z" fill="#141735" stroke="#4fb3f0" stroke-width="5"/>
+  <path d="M186 218 L150 254 L172 276 L212 238 Z" fill="#141735" stroke="#4fb3f0" stroke-width="5"/>
+  <!-- bottoni e logo -->
+  <path d="M150 256 L150 300" stroke="#2a3070" stroke-width="4"/>
+  <circle cx="150" cy="270" r="3.5" fill="#4a55b0" stroke="none"/><circle cx="150" cy="286" r="3.5" fill="#4a55b0" stroke="none"/>
+  <path d="M214 272 l9 5 l9 -9" fill="none" stroke="#4fb3f0" stroke-width="4"/>
+  <!-- collanina + ciondolo a ferro di cavallo -->
+  <path d="M128 224 C132 244 142 252 150 256 C158 252 168 244 172 224" fill="none" stroke="#2a2f48" stroke-width="2.5"/>
+  <path d="M142 258 C142 276 158 276 158 258" fill="none" stroke="#1d3b8b" stroke-width="7"/>
+  <path d="M142 258 C142 276 158 276 158 258" fill="none" stroke="#e4eaf2" stroke-width="3"/>
+</g>
+
+<!-- ===== PUGNO ===== -->
+<g stroke="#1d3b8b" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+  <rect x="233" y="262" width="34" height="80" fill="#dfae92"/>
+  <path d="M229 318 L271 318 L275 342 L225 342 Z" fill="#141735"/>
+  <path d="M229 318 L271 318" stroke="#4fb3f0" stroke-width="6"/>
+  <g class="s-ok">
+    <path d="M241 230 L241 200 C241 188 259 188 259 200 L259 230 Z" fill="#dfae92"/>
+  </g>
+  <rect x="227" y="222" width="46" height="46" rx="15" fill="#dfae92"/>
+  <path d="M227 233 L252 233 M227 245 L252 245 M227 257 L252 257" fill="none" stroke="#a86d55" stroke-width="3"/>
+  <g class="s-no"><path d="M236 262 C244 270 262 270 270 260" fill="none" stroke="#a86d55" stroke-width="3"/></g>
+</g>
+
+<!-- ===== TESTA (larga, piena, inclinata come in foto) ===== -->
+<g transform="translate(150 112) rotate(14)" stroke="#1d3b8b" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+  <!-- orecchie grandi -->
+  <ellipse cx="-88" cy="8" rx="15" ry="27" fill="#dfae92"/>
+  <ellipse cx="88" cy="8" rx="15" ry="27" fill="#dfae92"/>
+  <path d="M-91 -6 C-99 8 -95 22 -85 26 M91 -6 C99 8 95 22 85 26" fill="none" stroke="#a86d55" stroke-width="3.5"/>
+  <!-- faccia piena, mascella larga -->
+  <path d="M-80 -40 C-84 -80 -50 -96 0 -96 C50 -96 84 -80 82 -40 C90 -10 92 28 78 58 C64 86 36 102 0 102 C-36 102 -64 86 -78 58 C-92 28 -90 -10 -80 -40 Z" fill="#dfae92"/>
+  <path d="M-76 60 C-62 86 -34 102 0 102 C34 102 62 86 78 60 C58 84 30 92 0 92 C-30 92 -58 84 -76 60 Z" fill="#b57a62" opacity=".4" stroke="none"/>
+  <ellipse cx="-64" cy="52" rx="17" ry="10" fill="#e8806c" opacity=".35" stroke="none"/>
+  <ellipse cx="66" cy="50" rx="17" ry="10" fill="#e8806c" opacity=".35" stroke="none"/>
+  <path d="M-24 92 C-8 98 10 98 26 92" fill="none" stroke="#a86d55" stroke-width="3"/>
+
+  <!-- capelli corti argentati, spazzolati in su -->
+  <path d="M-86 -26 C-104 -52 -102 -84 -76 -104 C-66 -126 -34 -124 -22 -118 C-10 -134 22 -132 32 -118 C50 -126 76 -114 80 -98 C102 -82 102 -50 90 -26 C86 -40 78 -56 66 -68 C44 -80 14 -84 -10 -82 C-38 -80 -64 -70 -74 -54 C-82 -44 -86 -36 -86 -26 Z" fill="#efede8"/>
+  <path d="M-44 -110 C-50 -100 -54 -94 -62 -86 M-10 -118 C-14 -106 -16 -98 -24 -90 M26 -116 C28 -106 34 -98 42 -92 M62 -102 C68 -92 72 -82 74 -72 M-72 -84 C-78 -74 -80 -66 -82 -56" fill="none" stroke="#c4c0b6" stroke-width="3"/>
+  <!-- fronte alta: rughe e riflesso -->
+  <path d="M-30 -66 C-12 -70 12 -70 30 -66 M-22 -57 C-8 -60 8 -60 22 -57" fill="none" stroke="#a86d55" stroke-width="3"/>
+  <ellipse cx="24" cy="-72" rx="16" ry="5" fill="#fff" opacity=".45" stroke="none" transform="rotate(-10 24 -72)"/>
+
+  <!-- occhi piccoli e socchiusi -->
+  <g class="s-ok">
+    <path d="M-64 2 C-57 -8 -41 -8 -34 2 C-41 9 -57 9 -64 2 Z M34 2 C41 -8 57 -8 64 2 C57 9 41 9 34 2 Z" fill="#fff" stroke="#2d2433" stroke-width="3"/>
+    <circle cx="-47" cy="1.5" r="4.6" fill="#3b2a20" stroke="none"/><circle cx="51" cy="1.5" r="4.6" fill="#3b2a20" stroke="none"/>
+    <path d="M-66 0 C-56 -12 -42 -12 -32 0 M32 0 C42 -12 56 -12 66 0" fill="none" stroke="#2d2433" stroke-width="5"/>
+    <path d="M-62 13 C-52 17 -42 17 -34 13 M34 13 C42 17 52 17 62 13" fill="none" stroke="#a86d55" stroke-width="2.5"/>
+  </g>
+  <g class="s-no">
+    <path d="M-64 3 C-57 -3 -41 -3 -34 3 C-41 8 -57 8 -64 3 Z M34 3 C41 -3 57 -3 64 3 C57 8 41 8 34 3 Z" fill="#fff" stroke="#2d2433" stroke-width="3"/>
+    <circle cx="-47" cy="3" r="3.8" fill="#3b2a20" stroke="none"/><circle cx="51" cy="3" r="3.8" fill="#3b2a20" stroke="none"/>
+    <path d="M-67 -7 L-32 2 M67 -7 L32 2" fill="none" stroke="#2d2433" stroke-width="5"/>
+  </g>
+
+  <!-- occhiali rettangolari grandi, barra alta spessa -->
+  <rect x="-80" y="-22" width="62" height="46" rx="8" fill="#d8ecf7" fill-opacity=".28" stroke="#1b2154" stroke-width="6.5"/>
+  <rect x="18" y="-22" width="62" height="46" rx="8" fill="#d8ecf7" fill-opacity=".28" stroke="#1b2154" stroke-width="6.5"/>
+  <path d="M-80 -22 L-18 -22 M18 -22 L80 -22" fill="none" stroke="#1b2154" stroke-width="10"/>
+  <path d="M-18 -10 C-8 -16 8 -16 18 -10 M-80 -18 L-91 -16 M80 -18 L91 -16" fill="none" stroke="#1b2154" stroke-width="6"/>
+  <path d="M-72 -12 L-62 -12 M26 -12 L36 -12" fill="none" stroke="#fff" stroke-width="3" opacity=".8"/>
+
+  <!-- sopracciglia -->
+  <g class="s-ok" fill="none" stroke="#6e6a63" stroke-width="8">
+    <path d="M-76 -40 C-62 -56 -40 -56 -24 -42"/><path d="M24 -38 C40 -44 60 -44 76 -36"/>
+  </g>
+  <g class="s-no" fill="none" stroke="#6e6a63" stroke-width="9">
+    <path d="M-78 -52 L-22 -34"/><path d="M22 -34 L78 -52"/>
+  </g>
+
+  <!-- naso largo -->
+  <ellipse cx="-2" cy="32" rx="22" ry="13" fill="#c98f74" opacity=".5" stroke="none"/>
+  <path d="M8 -2 C12 10 14 18 14 26 M-24 30 C-26 46 22 48 20 30 M-24 30 C-25 23 -17 21 -13 25 M20 30 C21 23 14 21 11 25" fill="none" stroke-width="4"/>
+  <ellipse cx="-10" cy="37" rx="3.8" ry="2.8" fill="#1d3b8b" stroke="none"/><ellipse cx="8" cy="38" rx="3.8" ry="2.8" fill="#1d3b8b" stroke="none"/>
+  <!-- solchi naso-labiali e guance -->
+  <path d="M-32 44 C-48 56 -50 70 -42 82 M36 42 C54 52 56 66 50 78" fill="none" stroke="#a86d55" stroke-width="3.5"/>
+
+  <!-- bocca -->
+  <g class="s-ok">
+    <path d="M-36 66 C-18 76 14 76 40 58" fill="none" stroke-width="5"/>
+    <path d="M40 58 C46 56 48 50 46 46" fill="none" stroke-width="4"/>
+    <path d="M-20 79 C-6 87 14 85 26 75" fill="none" stroke="#a86d55" stroke-width="3.5"/>
+  </g>
+  <g class="s-no">
+    <rect x="-31" y="58" width="62" height="24" rx="10" fill="#fff" stroke-width="4"/>
+    <path d="M-15 59 L-15 81 M0 59 L0 81 M15 59 L15 81 M-30 70 L30 70" fill="none" stroke-width="2.5"/>
+    <path d="M-36 84 C-42 90 -42 96 -36 100 M36 84 C42 90 42 96 36 100" fill="none" stroke="#a86d55" stroke-width="3.5"/>
+  </g>
+</g>
+
+<!-- ===== EFFETTI ===== -->
+<g class="s-ok" fill="#4fb3f0" stroke="#1d3b8b" stroke-width="3" stroke-linejoin="round">
+  <path d="M34 36 L39 50 L53 55 L39 60 L34 74 L29 60 L15 55 L29 50 Z"/>
+  <path d="M272 28 L276 38 L286 42 L276 46 L272 56 L268 46 L258 42 L268 38 Z" fill="#26c19a"/>
+</g>
+<g class="s-no" fill="none" stroke="#ff7a45" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M44 40 L52 40 L52 32 M70 40 L62 40 L62 32 M44 54 L52 54 L52 62 M70 54 L62 54 L62 62" transform="translate(214 -6)"/>
+  <path d="M206 196 L196 190 M204 214 L192 214 M208 232 L198 240"/>
+</g>
+
+  </svg></div>
+  <div class="cam-bubble" id="cam-say"></div>
+</div>
 <script>
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -475,14 +618,16 @@ let ST=defStats(),prevScreen='s-home',rStreak=0;
 try{const j=JSON.parse(localStorage.getItem(SKEY));if(j&&j.note&&j.rh&&j.ear)ST=j;}catch(e){}
 function saveStats(){try{localStorage.setItem(SKEY,JSON.stringify(ST));}catch(e){}}
 function recNote(ok){
+  cameo(ok);
   if(ok){
     const n=ST.note;
     n.ok++;n.best[mode]=Math.max(n.best[mode],nScore);n.streak=Math.max(n.streak,nStreak);
   }else ST.note.ko++;
   saveStats();
 }
-function recRh(ok){if(ok){ST.rh.ok++;rStreak++;ST.rh.best=Math.max(ST.rh.best,rScore);ST.rh.streak=Math.max(ST.rh.streak||0,rStreak);}else{ST.rh.ko++;rStreak=0;}saveStats();}
+function recRh(ok){cameo(ok);if(ok){ST.rh.ok++;rStreak++;ST.rh.best=Math.max(ST.rh.best,rScore);ST.rh.streak=Math.max(ST.rh.streak||0,rStreak);}else{ST.rh.ko++;rStreak=0;}saveStats();}
 function recEar(ok){
+  cameo(ok);
   const e=ST.ear;e.tot[earN]++;if(ok)e.ok[earN]++;
   e.best[earN]=Math.max(e.best[earN],earScore);saveStats();
 }
@@ -501,6 +646,33 @@ function renderProfile(){
   document.getElementById('prof').innerHTML=`<div class="tiles">${h}</div>`;
 }
 function resetStats(){if(confirm('Vuoi azzerare tutti i record?')){ST=defStats();saveStats();renderProfile();}}
+
+/* ---------- Cameo: il personaggio che commenta giusto/sbagliato ---------- */
+const CAMEO_SAY={
+  ok:['Sei un cellutipo!','Ma ti sei drogato?','Culo!'],
+  no:['A chi ca@#u fai...','NO, ha sturiari!','Se, to soru...']
+};
+const CAMEO_CHANCE=.3,   // probabilità che compaia a ogni risposta
+      CAMEO_GAP=6000,    // pausa minima tra due apparizioni (ms)
+      CAMEO_MS=2700;     // quanto resta in scena (ms)
+let cameoLast=0,cameoTimer=null,cameoPrev={ok:-1,no:-1};
+function cameo(ok){
+  const now=Date.now();
+  if(Math.random()>CAMEO_CHANCE||now-cameoLast<CAMEO_GAP) return;
+  cameoLast=now;
+  const k=ok?'ok':'no',list=CAMEO_SAY[k];
+  let i;do{i=Math.floor(Math.random()*list.length);}while(i===cameoPrev[k]&&list.length>1);
+  cameoPrev[k]=i;
+  const el=document.getElementById('cameo');
+  clearTimeout(cameoTimer);
+  document.getElementById('cam-say').textContent=list[i];
+  el.style.transition='none';                       // cambia lato senza farlo attraversare lo schermo
+  el.className='cameo '+k+' '+(Math.random()<.5?'l':'r');
+  void el.offsetWidth;
+  el.style.transition='';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));
+  cameoTimer=setTimeout(()=>el.classList.remove('show'),CAMEO_MS);
+}
 </script>
 </body>
 </html>
