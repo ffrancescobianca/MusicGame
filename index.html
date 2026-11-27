@@ -130,7 +130,7 @@ h2{font-size:clamp(2rem,6vw,3rem);background:linear-gradient(transparent 58%,rgb
 <section id="s-menu" class="screen">
   <h2>Scegli un gioco</h2>
   <div class="menu">
-    <div class="game-card" onclick="go('s-clef')"><div class="ico">𝄞</div><h3>Indovina la nota</h3><p>Leggi il pentagramma e scegli la nota giusta</p></div>
+    <div class="game-card" onclick="loadPiano();go('s-clef')"><div class="ico">𝄞</div><h3>Indovina la nota</h3><p>Leggi il pentagramma e scegli la nota giusta</p></div>
     <div class="game-card" onclick="startRhythm()"><div class="ico">🥁</div><h3>Riconosci il ritmo</h3><p>Ascolta e scegli il ritmo corretto</p></div>
     <div class="game-card" onclick="go('s-ear-level')"><div class="ico">🎹</div><h3>Ear Training</h3><p>Ascolta i suoni e trovali sulla tastiera</p></div>
   </div>
@@ -354,7 +354,7 @@ function randNote(){
     const d=clef==='treble'?Math.floor(Math.random()*13):Math.floor(Math.random()*15)-12;
     const k=((d%7)+7)%7;
     n={clef,d,name:NAMES[k],y:clef==='treble'?110-5*d:50-5*d,
-       f:440*Math.pow(2,(60+12*Math.floor(d/7)+SEMI[k]-69)/12)};
+       m:60+12*Math.floor(d/7)+SEMI[k]};
   }while(cur&&n.clef===cur.clef&&n.d===cur.d);
   return n;
 }
@@ -375,7 +375,7 @@ function staffSVG(n){
   return s+'</svg>';
 }
 function startNote(m){
-  mode=m;nScore=0;nStreak=0;nWrong=0;cur=null;timeLeft=30;nRunning=true;prevBest=ST.note.best[m];
+  loadPiano();mode=m;nScore=0;nStreak=0;nWrong=0;cur=null;timeLeft=30;nRunning=true;prevBest=ST.note.best[m];
   const box=document.getElementById('note-answers');box.innerHTML='';
   NAMES.forEach(nm=>{
     const b=document.createElement('button');
@@ -418,7 +418,7 @@ function answerNote(btn,nm){
   if(locked) return;
   if(nm===cur.name){
     locked=true;btn.classList.add('ok');nScore++;nStreak++;scoreTxt();recNote(true);addTime(3);
-    tone(cur.f,ctx().currentTime,.8,'triangle');
+    pianoTone(cur.m,.3);
     setTimeout(nextNote,500);
   }else{
     nStreak=0;scoreTxt();recNote(false);nWrong++;btn.classList.add('no');
@@ -430,25 +430,50 @@ function answerNote(btn,nm){
 /* ---------- Gioco 2: Riconosci il ritmo ---------- */
 // valori in semicrome: 8 = minima, 6 = semiminima puntata, 4 = semiminima,
 // 3 = croma puntata, 2 = croma, 1 = semicroma  (misura da 16 = 4/4)
+// valori NEGATIVI = pause (-8 minima, -6 semiminima puntata, -4 semiminima, -3 croma puntata, -2 croma, -1 semicroma)
 const PATTERNS=[
   [4,4,4,4],[8,4,4],[4,4,8],[8,8],[6,2,4,4],[4,6,2,4],[3,1,4,4,4],[4,3,1,4,4],
   [2,2,2,2,4,4],[1,1,1,1,4,4,4],[4,1,1,1,1,4,4],[6,2,6,2],[3,1,3,1,4,4],
-  [2,1,1,4,4,4],[4,4,2,1,1,4],[2,4,2,4,4],[8,3,1,4],[6,2,2,2,4]
+  [2,1,1,4,4,4],[4,4,2,1,1,4],[2,4,2,4,4],[8,3,1,4],[6,2,2,2,4],
+  /* --- più difficili: sincopi, puntati, semicrome e pause --- */
+  [4,1,2,1,4,4],[1,2,1,2,2,4,4],[1,2,1,1,2,1,4,4],[2,4,2,2,4,2],
+  [3,3,2,3,3,2],[3,3,3,3,2,2],[3,3,4,3,3],[6,2,3,1,4],[4,6,2,2,2],[2,6,2,6],
+  [1,3,1,3,4,4],[3,1,2,2,4,4],[2,1,1,2,1,1,4,4],[1,1,1,1,1,1,1,1,4,4],
+  [6,6,4],[6,6,2,2],[6,2,4,2,2],[6,4,6],[2,4,4,4,2],[2,4,4,2,4],[4,2,4,2,4],
+  [2,2,4,4,2,2],[3,1,1,1,2,4,4],[4,3,1,2,2,4],[2,1,1,3,1,4,4],
+  [-4,4,4,4],[-2,2,4,-2,2,4],[-2,2,-2,2,4,4],[4,-2,2,-2,2,4],
+  [-1,1,2,4,4,4],[-4,1,1,2,4,4],[4,-1,1,2,4,4],[-2,1,1,4,4,4],
+  [4,4,-4,2,2],[1,1,2,-4,4,4],[4,2,2,-2,2,2,2],
+  /* --- con le pause --- */
+  [-8,4,4],[8,-4,4],[4,4,-8],[-4,4,-4,4],[-8,2,2,4],[-6,2,4,4],[4,-6,2,4],[-6,6,4],[-3,1,4,4,4],[-3,1,-3,1,4,4],[3,1,-3,1,4,4],[3,-1,2,2,4,4],[-2,2,-2,2,-2,2,-2,2],[-2,2,2,-2,2,2,4],[-4,2,2,-4,2,2],[-1,1,1,1,4,4,4],[1,1,-1,1,4,4,4],[1,1,1,-1,4,4,4],[-1,1,-1,1,4,4,4],[4,-2,1,1,4,4],[-2,1,1,-2,1,1,4,4],[-4,3,1,4,4],[-6,2,-6,2],[-2,6,-2,6],[-2,2,-6,2,4],[4,-4,2,2,4],[-8,8],[-2,4,-2,4,4],[-1,1,2,-2,2,4,4]
 ];
+let lastTarget=null;
+// posizioni (in semicrome) in cui si sente un attacco: le pause non suonano
+const onsets=p=>{let t=0;const o=[];p.forEach(d=>{if(d>0)o.push(t);t+=Math.abs(d);});return o;};
+const rdist=(a,b)=>{const A=onsets(a),B=onsets(b);return A.filter(x=>!B.includes(x)).length+B.filter(x=>!A.includes(x)).length;};
 let target=null,rScore=0,rLocked=false;
 
 function rhythmSVG(p){
-  const gap=34,xs=[],st=[];let s0=0,x=22;
-  p.forEach(d=>{xs.push(x);st.push(s0);s0+=d;x+=gap+((d===3||d===6)?8:0);});
+  const gap=p.length>8?27:34,xs=[],st=[];let s0=0,x=22;
+  p.forEach(d=>{xs.push(x);st.push(s0);s0+=Math.abs(d);x+=gap+((Math.abs(d)===3||Math.abs(d)===6)?8:0);});
   const w=x+6,c='currentColor';
   let s=`<svg viewBox="0 0 ${w} 66" width="${w}" height="66" fill="none" stroke="${c}">`;
   p.forEach((d,i)=>{
     const X=xs[i];
+    if(d<0){
+      const a=-d;
+      if(a===8) s+=`<line x1="${X-9}" x2="${X+9}" y1="40" y2="40" stroke-width="2.4"/><rect x="${X-6}" y="33" width="12" height="7" fill="${c}"/>`;
+      else if(a===4||a===6) s+=`<path d="M${X-2} 16 L${X+5} 26 L${X-2} 35 L${X+5} 44 Q${X-4} 46 ${X-1} 54" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>`;
+      else if(a===2||a===3) s+=`<circle cx="${X-1}" cy="26" r="3.3" fill="${c}"/><path d="M${X+6} 20 Q${X+3} 27 ${X-1} 27 M${X+6} 20 L${X-2} 52" stroke-width="2.4" stroke-linecap="round"/>`;
+      else s+=`<circle cx="${X+1}" cy="24" r="3" fill="${c}"/><circle cx="${X-3}" cy="35" r="3" fill="${c}"/><path d="M${X+7} 18 Q${X+5} 24 ${X+1} 24 M${X+3} 29 Q${X+1} 35 ${X-3} 35 M${X+7} 18 L${X-4} 53" stroke-width="2.4" stroke-linecap="round"/>`;
+      if(a===3||a===6) s+=`<circle cx="${X+(a===6?13:11)}" cy="${a===6?30:34}" r="2.3" fill="${c}"/>`;
+      return;
+    }
     s+=`<ellipse cx="${X}" cy="52" rx="8" ry="5.5" transform="rotate(-20 ${X} 52)" ${d===8?'stroke-width="2"':`fill="${c}"`}/>`;
     s+=`<line x1="${X+7.5}" x2="${X+7.5}" y1="50" y2="14" stroke-width="2"/>`;
     if(d===3||d===6) s+=`<circle cx="${X+16}" cy="48" r="2.3" fill="${c}"/>`;
   });
-  const ok=i=>i<p.length&&p[i]<4&&Math.floor(st[i]/4)===Math.floor((st[i]+p[i]-1)/4);
+  const ok=i=>i<p.length&&p[i]>0&&p[i]<4&&Math.floor(st[i]/4)===Math.floor((st[i]+p[i]-1)/4);
   const grouped=new Set();
   for(let i=0;i<p.length;i++){
     if(!ok(i)||grouped.has(i)) continue;
@@ -466,7 +491,7 @@ function rhythmSVG(p){
     });
   }
   p.forEach((d,i)=>{
-    if(grouped.has(i)||d>=4) return;
+    if(grouped.has(i)||d>=4||d<0) return;
     const fx=xs[i]+7.5,n=d===1?2:1;
     for(let f=0;f<n;f++) s+=`<path d="M${fx} ${14+f*8} c2 9 13 11 9 23" stroke-width="2.5"/>`;
   });
@@ -476,8 +501,12 @@ function rhythmSVG(p){
 function startRhythm(){rScore=0;rStreak=0;go('s-rhythm');newRhythm();}
 function newRhythm(){
   rLocked=false;
-  const pool=[...PATTERNS].sort(()=>Math.random()-.5).slice(0,4);
-  target=pool[Math.floor(Math.random()*4)];
+  do{target=PATTERNS[Math.floor(Math.random()*PATTERNS.length)];}while(target===lastTarget);
+  lastTarget=target;
+  // le 3 alternative sono scelte fra i ritmi più simili a quello da riconoscere
+  const near=PATTERNS.filter(q=>q!==target).map(q=>({q,k:rdist(q,target)+Math.random()*2.5}))
+    .sort((a,b)=>a.k-b.k).slice(0,3).map(o=>o.q);
+  const pool=[target,...near].sort(()=>Math.random()-.5);
   const box=document.getElementById('rh-opts');box.innerHTML='';
   pool.forEach(p=>{
     const b=document.createElement('button');
@@ -507,9 +536,11 @@ function playPattern(){
   timers.push(setTimeout(()=>{spans.forEach(e=>e.classList.remove('on'));status.textContent='🎶 Ascolta il ritmo!';},(lead+4*beat)*1000));
   let t=t0+4*beat;
   target.forEach(d=>{
-    const dur=Math.min(d*unit*.9,.4);
-    tone(392,t,dur,'triangle',.55,master);tone(784,t,dur*.6,'sine',.2,master);
-    t+=d*unit;
+    if(d>0){
+      const dur=Math.min(d*unit*.9,.4);
+      tone(392,t,dur,'triangle',.55,master);tone(784,t,dur*.6,'sine',.2,master);
+    }
+    t+=Math.abs(d)*unit;
   });
   timers.push(setTimeout(()=>{status.textContent='';},(t-a.currentTime)*1000+300));
 }
@@ -531,7 +562,7 @@ const KEYMAP={};
 let earN=1,earSeq=false,earTarget=[],earSel=[],earLocked=false,earScore=0,earTotal=0;
 const mf=m=>440*Math.pow(2,(m-69)/12);
 // Campioni di pianoforte reali (Salamander Grand Piano) caricati da internet; senza connessione si usa un suono sintetico
-const PIANO_URL='https://tonejs.github.io/audio/salamander/',PIANO_ROOTS={60:'C4',63:'Ds4',66:'Fs4',69:'A4',72:'C5'};
+const PIANO_URL='https://tonejs.github.io/audio/salamander/',PIANO_ROOTS={36:'C2',39:'Ds2',42:'Fs2',45:'A2',48:'C3',51:'Ds3',54:'Fs3',57:'A3',60:'C4',63:'Ds4',66:'Fs4',69:'A4',72:'C5',75:'Ds5',78:'Fs5',81:'A5'};
 let pianoBuf={},pianoP=null;
 function loadPiano(){
   if(!pianoP){
